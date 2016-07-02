@@ -3,18 +3,13 @@
 // Load database connection, helpers, etc.
 require_once(__DIR__ . '/errors.php');
 require_once(__DIR__ . '/include.php');
+require_once(__DIR__ . '/LTV_Reports.php');
 
 // Vars
 $period = 12; // Life-Time of 12 months
 $commission = 0.10; // 10% commission
 
-// Prepare query
-$result = $db
-	->prepare('
-		SELECT * FROM bookings
-	')
-	->run()
-;
+$LTV = new LTV_Reports($db);
 ?>
 <!doctype html>
 <html>
@@ -45,22 +40,29 @@ $result = $db
 		<table class="report-table">
 			<thead>
 				<tr>
-					<th>Start</th>
-					<th>Bookers</th>
+					<th>bookingitems.end_timestamp</th>
+					<th>bookers.id</th>
 					<th># of bookings (avg)</th>
 					<th>Turnover (avg)</th>
 					<th>LTV</th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($result as $index => $row): ?>
+				<?php foreach ($LTV->get_first_time_booking_spaces() as $index => $row): ?>
 					<tr>
-						<td>TODO</td>
-						<td>TODO</td>
-						<td>TODO</td>
-						<td>TODO</td>
-						<td>TODO</td>
+						<td><?= $row->end_timestamp ?></td>
+						<td><?= $row->booker_id ?></td>
+						<td></td>
+						<td></td>
+						<td></td>
 					</tr>
+					<!-- <tr> -->
+						<!-- <td></td>
+						<td></td>
+						<td>TODO</td>
+						<td>TODO</td>
+						<td>TODO</td> -->
+					<!-- </tr> -->
 				<?php endforeach; ?>
 			</tbody>
 			<tfoot>
