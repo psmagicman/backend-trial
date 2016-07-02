@@ -3,6 +3,7 @@
 // Load database connection, helpers, etc.
 require_once(__DIR__ . '/errors.php');
 require_once(__DIR__ . '/include.php');
+require_once(__DIR__ . '/post.php');
 require_once(__DIR__ . '/LTV_Reports.php');
 
 // Vars
@@ -40,29 +41,22 @@ $LTV = new LTV_Reports($db);
 		<table class="report-table">
 			<thead>
 				<tr>
-					<th>bookingitems.end_timestamp</th>
-					<th>bookers.id</th>
+					<th>Start</th>
+					<th>Bookers</th>
 					<th># of bookings (avg)</th>
 					<th>Turnover (avg)</th>
 					<th>LTV</th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($LTV->get_first_time_booking_spaces() as $index => $row): ?>
+				<?php foreach ($LTV->get_bookings(1, 1) as $index => $row): ?>
 					<tr>
-						<td><?= $row->end_timestamp ?></td>
-						<td><?= $row->booker_id ?></td>
-						<td></td>
-						<td></td>
+						<td><?= $row->month ?></td>
+						<td><?= $row->total_first_bookings ?></td>
+						<td><?= $row->total_bookings ?></td>
+						<td><?= $row->total_turnover ?></td>
 						<td></td>
 					</tr>
-					<!-- <tr> -->
-						<!-- <td></td>
-						<td></td>
-						<td>TODO</td>
-						<td>TODO</td>
-						<td>TODO</td> -->
-					<!-- </tr> -->
 				<?php endforeach; ?>
 			</tbody>
 			<tfoot>

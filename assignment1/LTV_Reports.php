@@ -1,8 +1,5 @@
 <?php
 
-/**
-* 
-*/
 class LTV_Reports {
     
     private $db;
@@ -11,13 +8,38 @@ class LTV_Reports {
         $this->db = $db;    
     }
 
-    public function get_first_time_booking_spaces() {
-        $query = "SELECT bookings.booker_id AS booker_id, MIN(bookingitems.end_timestamp) AS end_timestamp ";
-        $query .= "FROM bookings ";
-        $query .= "INNER JOIN bookingitems ON bookings.id = bookingitems.booking_id ";
-        $query .= "INNER JOIN spaces ON bookingitems.item_id = spaces.item_id ";
-        $query .= "GROUP BY bookings.booker_id";
+    /*
+    * $start: date in %m-%Y format
+    * $period: integer
+    */
+    public function get_bookings($start, $period) {
+
+        $query = <<<Q
+            SELECT strftime('%m-%Y', bookingsperiod.end_timestamp, 'unixepoch') AS month, COUNT(bookingsperiod.booker_id) AS total_first_bookings, 
+                SUM(bookingsperiod.bookings_made) AS total_bookings, SUM(bookingsperiod.bookingitems_turnover) AS total_turnover 
+            FROM (
+                SELECT firstbookings.booker_id, firstbookings.end_timestamp, COUNT(bookings.id) AS bookings_made, 
+                SUM(bookingitems.locked_total_price) AS bookingitems_turnover FROM (
+                    SELECT bookings.booker_id AS booker_id, MIN(bookingitems.end_timestamp) AS end_timestamp
+                    FROM bookings
+                    INNER JOIN bookingitems ON bookings.id = bookingitems.booking_id
+                    INNER JOIN spaces ON bookingitems.item_id = spaces.item_id
+                    GROUP BY bookings.booker_id
+                ) AS firstbookings
+                INNER JOIN bookings ON firstbookings.booker_id = bookings.booker_id
+                INNER JOIN bookingitems ON bookings.id = bookingitems.booking_id
+                INNER JOIN spaces ON bookingitems.booking_id = spaces.item_id
+                WHERE strftime('%s', firstbookings.end_timestamp, 'unixepoch') 
+                    BETWEEN strftime('%s', 1376956800, 'unixepoch', 'start of month') AND strftime('%s', 1376956800, 'unixepoch', '+18 months', 'start of month')
+                GROUP BY firstbookings.booker_id
+            ) AS bookingsperiod
+            GROUP BY strftime('%m-%Y', bookingsperiod.end_timestamp, 'unixepoch')
+Q;
         return $this->run_query($query);
+    }
+
+    private function convert_to_seconds() {
+
     }
 
 
@@ -25,3 +47,8 @@ class LTV_Reports {
         return $this->db->prepare($query)->run();
     }
 }
+
+
+
+
+
