@@ -53,9 +53,9 @@ $LTV = new LTV_Reports($db);
 					<tr>
 						<td><?= $row->month ?></td>
 						<td><?= $row->total_first_bookings ?></td>
-						<td><?= $row->total_bookings ?></td>
-						<td><?= $row->total_turnover ?></td>
-						<td></td>
+						<td><?= number_format($row->total_bookings/$period, 2) ?></td>
+						<td><?= number_format($row->total_turnover/$period, 2) ?></td>
+						<td><?= number_format(($row->total_turnover/$period) * $commission, 2)?></td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
