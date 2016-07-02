@@ -13,9 +13,10 @@ class LTV_Reports {
     * $period: integer
     */
     public function get_bookings($start = null, $period = null) {
-        // $start_time = strtotime();
         if (null === $start) {
             $start = 1376956800; // August 2013
+        } else {
+            $start = strtotime($start);
         }
         if (null === $period) {
             $period = 12;
